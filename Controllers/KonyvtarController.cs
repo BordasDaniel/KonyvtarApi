@@ -86,7 +86,24 @@ namespace KonyvtarApi.Controllers
             {
                 try
                 {
-                    List<MegyeDTO> megyedtoList = context.Telepuleseks.Include(k => k.Konyvtaraks).Include(m => m.Megye).Select()
+                    List<MegyeDTO> megyedtoList = context.Telepuleseks.Include(m => m.Megye).Include(k => k.Konyvtaraks).Select(l => new MegyeDTO()
+                    {
+                        Id = l.Id,
+                        TelepulesNev = l.TelepNev,
+                        KonyvtarNev = l.KonyvtarNev,
+                    });
+
+
+                    if (megyedtoList.Count > 0)
+                    {
+                        return Ok(megyedtoList);
+                    }
+
+                    if (megyedtoList.Count < 0)
+                    {
+                        return NotFound($"Nincs ilyen megye: {megye}");
+                    }
+                    return BadRequest();
 
 
                 } catch (Exception ex)
