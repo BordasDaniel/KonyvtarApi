@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KonyvtarApi.Controllers
 {
-    [Route("Konyvtar/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class konyvtarakController : ControllerBase
+    public class KonyvtarController : ControllerBase
     {
         [HttpGet("GetAll")]
         public IActionResult GetAllKonyvtarak()
@@ -64,7 +64,7 @@ namespace KonyvtarApi.Controllers
             }
         }
 
-        [HttpDelete("Torol")]
+        [HttpDelete("Torol/{id}")]
         public IActionResult DeleteKonyvtarak(int id)
         {
             using (var context =new KonyvtarakContext())
