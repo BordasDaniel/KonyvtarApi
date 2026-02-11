@@ -86,12 +86,12 @@ namespace KonyvtarApi.Controllers
             {
                 try
                 {
-                    List<MegyeDTO> megyedtoList = context.Telepuleseks.Include(m => m.Megye).Include(k => k.Konyvtaraks).Select(l => new MegyeDTO()
+                    List<MegyeDTO> megyedtoList = context.Konyvtaraks.Select(l => new MegyeDTO()
                     {
                         Id = l.Id,
-                        TelepulesNev = l.TelepNev,
-                        KonyvtarNev = l.KonyvtarNev,
-                    });
+                        TelepulesNev = l.IrszNavigation.TelepNev,
+                        KonyvtarNev = l.KonyvtarNev
+                    }).ToList();
 
 
                     if (megyedtoList.Count > 0)
