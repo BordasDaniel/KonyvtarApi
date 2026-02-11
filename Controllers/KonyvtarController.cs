@@ -1,6 +1,8 @@
-﻿using KonyvtarApi.Models;
+﻿using KonyvtarApi.DTOs;
+using KonyvtarApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace KonyvtarApi.Controllers
 {
@@ -24,6 +26,76 @@ namespace KonyvtarApi.Controllers
                 }
             }    
         }
+
+        [HttpGet("GetById/{id}")]
+        public IActionResult GetByIdKonyvtarak(int id)
+        {
+            using (var context = new KonyvtarakContext())
+            {
+                try
+                {
+                    Konyvtarak? keresett = context.Konyvtaraks.FirstOrDefault(k => k.Id == id);
+                    if (keresett != null)
+                    {
+                        return Ok(keresett);
+                    }
+                    if (keresett == null)
+                    {
+                        return NotFound($"Nincs ilyen id: {id}");
+                    }
+                    return BadRequest();
+
+                } catch(Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
+
+        [HttpGet("Telepules/{telepules}")]
+        public IActionResult GetByTelepules(string telepules)
+        {
+            using (var context = new KonyvtarakContext())
+            {
+                try
+                {
+                    var keresett = context.Telepuleseks.Include(t => t.Konyvtaraks).Where(x => x.TelepNev == telepules).Select(t => t.Konyvtaraks).ToList();
+
+                    if(keresett.Count > 0)
+                    {
+                        return Ok(keresett);
+                    }
+                    if (keresett.Count < 0)
+                    {
+                        return NotFound($"Nincs ilyen település: {telepules}");
+                    }
+
+                    return BadRequest();
+
+                } catch(Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
+
+        [HttpGet("Megye/{megye}")]
+        public IActionResult GetByMegye(string megye)
+        {
+            using (var context = new KonyvtarakContext())
+            {
+                try
+                {
+                    List<MegyeDTO> megyedtoList = context.Telepuleseks.Include(k => k.Konyvtaraks).Include(m => m.Megye).Select()
+
+
+                } catch (Exception ex)
+                {
+                    return BadRequest(ex.Message);
+                }
+            }
+        }
+
 
         [HttpPost("Uj")]
         public IActionResult NewKonyvtarak(Konyvtarak konyvtar)
