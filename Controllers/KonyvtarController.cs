@@ -79,6 +79,31 @@ namespace KonyvtarApi.Controllers
             }
         }
 
+        [HttpGet("KonyvtarNevreszlet/{nevreszlet}")]
+        public IActionResult GetNevreszlet(string nevreszlet)
+        {
+            using (var context = new KonyvtarakContext())
+            {
+                try
+                {
+                    List<string> helyek = context.Konyvtaraks.Where(k => k.KonyvtarNev.Contains(nevreszlet)).Select(k => k.IrszNavigation.TelepNev).ToList();
+                    if (helyek.Count > 0)
+                    {
+                        return Ok(helyek);
+                    }
+                    if (helyek.Count < 0)
+                    {
+                        return NotFound("Nincs ilyen");
+                    }
+                    return BadRequest();
+
+                } catch(Exception ex)
+                {
+                    return BadRequest();
+                }
+            }
+        }
+
         [HttpGet("Megye/{megye}")]
         public IActionResult GetByMegye(string megye)
         {
