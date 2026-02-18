@@ -1,6 +1,8 @@
-﻿using KonyvtarApi.Models;
+﻿using KonyvtarApi.DTOs;
+using KonyvtarApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace KonyvtarApi.Controllers
 {
@@ -58,23 +60,14 @@ namespace KonyvtarApi.Controllers
             {
                 try
                 {
-                    var keresett = context.Telepuleseks.FirstOrDefault(u => u.Id == id);
-                    Telepulesek telep = new()
-                    {
-                        Id = id
-                    };
-
+                    Telepulesek? keresett = context.Telepuleseks.FirstOrDefault(k => k.Id == id);
                     if (keresett != null)
                     {
-                        context.Remove(telep);
-                        return Ok("Sikeres törlés!");
+                        context.Remove(keresett);
+                        context.SaveChanges();
+                        return Ok();
                     }
-                    else
-                    {
-                        return NotFound("Nincs ilyen!");
-                    }
-
-
+                    return NotFound("Nincs ilyen.");
                 } catch(Exception ex) {
                     return BadRequest("Sikertelen törlés");
                 }
@@ -88,7 +81,20 @@ namespace KonyvtarApi.Controllers
             {
                 try
                 {
-                    var keresettek = context.Te
+                    var keresettek = context.Telepuleseks.Include(m => m.Megye).Where(n => n.TelepNev.Contains(reszlet)).Select(d => new TelepMegyeDTO()
+                    {
+                        TelepNev = d.TelepNev,
+                        Megyenev = d.Megye.MegyeNev,
+                    }).ToList();
+
+                    if (keresettek.Count > 0)
+                    {
+                        return Ok(keresettek);
+                    }
+                    else
+                    {
+                        return NotFound("Nincs találat");
+                    }
 
                 } catch(Exception ex)
                 {
@@ -96,9 +102,5 @@ namespace KonyvtarApi.Controllers
                 }
             }
         }
-
-
-
-
     }
 }
